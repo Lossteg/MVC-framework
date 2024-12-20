@@ -6,7 +6,7 @@ services:
       context: ./docker/php
     container_name: php
     volumes:
-      - ./app:/var/www/app
+      - ./App:/var/www/App
     networks:
       - project-network
     user: 1000:1000
@@ -18,7 +18,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./app:/var/www/app
+      - ./App:/var/www/App
       - nginx-logs:/var/log/nginx
     depends_on:
       - php
