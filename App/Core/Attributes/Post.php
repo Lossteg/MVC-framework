@@ -2,8 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace App\Attributes;
+namespace App\Core\Attributes;
 
+use App\Core\Attributes\Route;
 use App\Core\Enums\HttpMethod;
 use Attribute;
 

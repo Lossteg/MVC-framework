@@ -47,12 +47,10 @@ class Container implements ContainerInterface
         $id = $this->aliases[$id] ?? $id;
 
         if (isset($this->instances[$id])) {
-            echo "'$id' is already instantiated";
             return $this->instances[$id];
         }
 
         if (isset($this->services[$id])) {
-            echo "'$id' was set to services array";
             return $this->instances[$id] = $this->autowire($this->services[$id]);
         }
 
@@ -61,8 +59,6 @@ class Container implements ContainerInterface
             В set мы регаем, но применяем только там, где надо
             т.е. через этот метод гет
         */
-
-        var_dump($id);
 
         //Если передали имя класса
         if (class_exists($id)) {

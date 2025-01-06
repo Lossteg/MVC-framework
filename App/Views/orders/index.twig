@@ -1,0 +1,27 @@
+{% extends "layout.twig" %}
+
+{% block title %}All Orders{% endblock %}
+
+{% block content %}
+    <h1 style="margin-bottom: 2rem;">All Orders</h1>
+
+    <div class="grid">
+        {% for order in orders %}
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">Order #{{ order.id }}</h3>
+                <p style="margin-bottom: 0.5rem;"><strong>Customer ID:</strong> {{ order.user_id }}</p>
+                <p style="margin-bottom: 0.5rem;"><strong>Products:</strong> {{ order.products }}</p>
+                <p style="margin-bottom: 0.5rem;"><strong>Total:</strong> ${{ order.total|number_format(2) }}</p>
+                <p style="margin-bottom: 1rem;">
+                    <strong>Status:</strong>
+                    <span class="badge {% if order.status == 'completed' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ order.status|capitalize }}
+                    </span>
+                </p>
+                <a href="/order/{{ order.id }}" class="btn btn-primary">View Details</a>
+            </div>
+        {% else %}
+            <p>No orders found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

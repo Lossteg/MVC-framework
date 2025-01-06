@@ -5,30 +5,51 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Attributes\Get;
+use App\Core\Attributes\Post;
+use App\Core\Attributes\RouteGroup;
 use App\Core\View;
 use App\Services\Contracts\OrderServiceInterface;
 
+#[RouteGroup('/order')]
 class OrderController
 {
-    public function __construct(private OrderServiceInterface $orderService)
+    public function __construct(private readonly OrderServiceInterface $orderService)
     {}
 
-    #[Get('/order')]
-    public function index(): void
+    #[Get('/{id}')]
+    public function getOrder(int $id): string
+    {
+        $order = $this->orderService->getOrderById($id);
+
+        if (!$order) {
+            http_response_code(404);
+            return View::make('error/404');
+        }
+
+        return View::make('orders/show', ['order' => $order]);
+    }
+
+    #[Get('/')]
+    public function getAllOrders(): string
     {
         $orders = $this->orderService->getAllOrders();
-        echo View::make('order', compact($orders)) . "<p>Working fine</p>";
-
+        return View::make('orders/index', ['orders' => $orders]);
     }
 
-    public function create(): void
+    #[Post('/create/')]
+    public function createOrder(): void
     {
-        echo View::make('order', 'create');
-    }
-
-    public function store(array $data): void
-    {
+        $data = $_POST;
         $this->orderService->createOrder($data);
-        header('Location: /order');
+        echo "<br /> create order success";
+        echo "<pre />";
+        print_r($data);
+        echo "</pre>";
+    }
+
+    #[Get('/create')]
+    public function showCreateForm(): string
+    {
+        return View::make('orders/create');
     }
 }

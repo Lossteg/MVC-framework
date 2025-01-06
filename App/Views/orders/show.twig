@@ -1,0 +1,33 @@
+{% extends "layout.twig" %}
+
+{% block title %}Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h2 style="margin-bottom: 1.5rem;">Order Details #{{ order.id }}</h2>
+
+        <div style="margin-bottom: 1rem;">
+            <strong>Customer ID:</strong> {{ order.user_id }}
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <strong>Products:</strong><br>
+            {% for product in order.products|split(',') %}
+                <span class="badge badge-warning" style="margin: 0.25rem;">{{ product|trim }}</span>
+            {% endfor %}
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <strong>Total:</strong> ${{ order.total|number_format(2) }}
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <strong>Status:</strong>
+            <span class="badge {% if order.status == 'completed' %}badge-success{% else %}badge-warning{% endif %}">
+                {{ order.status|capitalize }}
+            </span>
+        </div>
+
+        <a href="/order" class="btn btn-secondary">Back to Orders</a>
+    </div>
+{% endblock %}

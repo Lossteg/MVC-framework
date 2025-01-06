@@ -23,8 +23,6 @@ class App
         protected array $request,
     ) {
         $this->container ->set(OrderServiceInterface::class, OrderService::class);
-        $this->container ->set(ProductServiceInterface::class, ProductService::class);
-        $this->container ->set(UserServiceInterface::class, UserService::class);
     }
 
     public function run(): void

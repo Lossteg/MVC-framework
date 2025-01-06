@@ -6,7 +6,7 @@ namespace App\Services\Contracts;
 
 interface OrderServiceInterface
 {
+    public function getOrderById(int $id): ?array;
     public function getAllOrders(): array;
     public function createOrder(array $data): array;
-    public function updateOrder(int $id, array $data): ?array;
 }
