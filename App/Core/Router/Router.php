@@ -29,8 +29,7 @@ class Router
     public function autoloadRoutes(): void
     {
         $files = $this->scanControllerDirectory();
-        $controllers = $this->getControllerClasses($files);
-        $this->registerFromAttribute($controllers);
+        $this->registerControllers($files);
     }
 
     private function scanControllerDirectory(): RegexIterator
@@ -54,10 +53,8 @@ class Router
         );
     }
 
-    private function getControllerClasses(RegexIterator $files): array
+    public function registerControllers(RegexIterator $files): void
     {
-        $controllers = [];
-
         foreach ($files as $file) {
             $fileName = $file[0];
             // Убираем расширение .php
@@ -65,19 +62,13 @@ class Router
 
             $className = self::CONTROLLER_NAMESPACE . $className;
 
-            if (class_exists($className)) {
-                $controllers[] = $className;
-            } else {
+            if (!class_exists($className)) {
                 echo "Class does not exist: " . $className . "<br>";
+                continue;
             }
-        }
-        return $controllers;
-    }
 
-    public function registerFromAttribute(array $controllers): void
-    {
-        foreach ($controllers as $controller) {
-            $reflectionController = new ReflectionClass($controller);
+            // Работаем с существующим классом контроллера
+            $reflectionController = new ReflectionClass($className);
             $groupPrefix = $this->getGroupPrefix($reflectionController);
 
             foreach ($reflectionController->getMethods() as $method) {
@@ -86,7 +77,7 @@ class Router
                 foreach ($attributes as $attribute) {
                     $route = $attribute->newInstance();
                     $path = $this->buildRoutePath($groupPrefix, $route->routePath);
-                    $this->register($route->method->value, $path, [$controller, $method->getName()]);
+                    $this->register($route->method->value, $path, [$className, $method->getName()]);
                 }
             }
         }

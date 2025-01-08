@@ -32,6 +32,7 @@ class OrderService implements OrderServiceInterface
                 return $order;
             }
         }
+
         return null;
     }
 
@@ -50,6 +51,7 @@ class OrderService implements OrderServiceInterface
             'status' => 'pending',
         ];
         $this->orders[] = $newOrder;
+
         return $newOrder;
     }
 }

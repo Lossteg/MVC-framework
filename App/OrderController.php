@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers;
+namespace App;
 
 use App\Core\Attributes\Get;
 use App\Core\Attributes\Post;
 use App\Core\Attributes\RouteGroup;
-use App\Core\View;
+use App\Core\View\View;
 use App\Services\Contracts\OrderServiceInterface;
 
-#[RouteGroup('/order')]
-class OrderController
+#[RouteGroup('/orders')]
+readonly class OrderController
 {
     public function __construct(private readonly OrderServiceInterface $orderService)
     {}

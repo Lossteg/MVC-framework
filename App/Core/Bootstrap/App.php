@@ -2,27 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Core\Bootstrap;
 
 use App\Core\DI\Container;
-use App\Core\Router\Router;
-use App\Core\View;
 use App\Core\Exceptions\RouteNotFoundException;
+use App\Core\Router\Router;
+use App\Core\View\View;
 use App\Services\Contracts\OrderServiceInterface;
-use App\Services\Contracts\ProductServiceInterface;
-use App\Services\Contracts\UserServiceInterface;
 use App\Services\OrderService;
-use App\Services\ProductService;
-use App\Services\UserService;
 
-class App
+readonly class App
 {
     public function __construct(
         protected Container $container,
         protected Router $router,
         protected array $request,
     ) {
-        $this->container ->set(OrderServiceInterface::class, OrderService::class);
+        $this->container->set(OrderServiceInterface::class, OrderService::class);
+        $router->autoloadRoutes();
     }
 
     public function run(): void
