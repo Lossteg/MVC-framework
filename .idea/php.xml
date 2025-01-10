@@ -10,6 +10,11 @@
     <option name="highlightLevel" value="WARNING" />
     <option name="transferred" value="true" />
   </component>
+  <component name="PhpCSFixer">
+    <phpcsfixer_settings>
+      <PhpCSFixerConfiguration tool_path="$PROJECT_DIR$/App/vendor/bin/php-cs-fixer" />
+    </phpcsfixer_settings>
+  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/App/vendor/composer" />
@@ -18,9 +23,43 @@
       <path value="$PROJECT_DIR$/App/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/App/vendor/symfony/deprecation-contracts" />
       <path value="$PROJECT_DIR$/App/vendor/twig/twig" />
+      <path value="$PROJECT_DIR$/App/vendor/phpstan/phpstan" />
+      <path value="$PROJECT_DIR$/App/vendor/clue/ndjson-react" />
+      <path value="$PROJECT_DIR$/App/vendor/friendsofphp/php-cs-fixer" />
+      <path value="$PROJECT_DIR$/App/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/App/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/App/vendor/react/child-process" />
+      <path value="$PROJECT_DIR$/App/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/App/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/App/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/App/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/App/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/App/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/App/vendor/fidry/cpu-core-counter" />
+      <path value="$PROJECT_DIR$/App/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/App/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/App/vendor/psr/event-dispatcher" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/polyfill-intl-normalizer" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/event-dispatcher-contracts" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/polyfill-intl-grapheme" />
+      <path value="$PROJECT_DIR$/App/vendor/symfony/stopwatch" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />
+  <component name="PhpStan">
+    <PhpStan_settings>
+      <PhpStanConfiguration tool_path="$PROJECT_DIR$/App/vendor/bin/phpstan" />
+    </PhpStan_settings>
+  </component>
   <component name="PhpStanOptionsConfiguration">
     <option name="transferred" value="true" />
   </component>

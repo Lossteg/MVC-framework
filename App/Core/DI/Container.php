@@ -5,27 +5,43 @@ declare(strict_types=1);
 namespace App\Core\DI;
 
 use ReflectionClass;
-use ReflectionException;
 
 class Container implements ContainerInterface
 {
-    protected array $services = [];        // Зарегистрированные объекты
-    protected array $aliases = [];         // (интерфейсы => реализации)
-    protected array $instances = [];       // Уже созданные объекты
-    protected array $parameters = [];
-    protected array $globalParameters = [];
-    protected array $resolving = []; //Отслеживает текущие зависимости в процесссе разрешения
+    /** @var array<string, class-string> */
+    protected array $services = [];
 
+    /** @var array<string, string> */
+    protected array $aliases = [];
+
+    /** @var array<string, object> */
+    protected array $instances = [];
+
+    /** @var array<string, array<string, mixed>> */
+    protected array $parameters = [];
+
+    /** @var array<string, mixed> */
+    protected array $globalParameters = [];
+
+    /** @var array<string, bool> */
+    protected array $resolving = [];
+
+    /**
+     * @param class-string|string $id
+     * @param class-string $service
+     * @throws \Exception
+     */
     public function set(string $id, string $service): void
     {
-        if(isset($this->services[$id]) || isset($this->aliases[$id])) {
+        if (isset($this->services[$id]) || isset($this->aliases[$id])) {
             throw new \InvalidArgumentException(
                 \sprintf('The "%s" service is already initialized, you cannot replace it.', $id)
             );
         }
 
         if (interface_exists($id)) {
-            if (!in_array($id, class_implements($service))) {
+            $implements = class_implements($service);
+            if ($implements === false || !in_array($id, $implements, true)) {
                 throw new \Exception("Class '$service' must implement interface '$id'.");
             }
 
@@ -42,45 +58,44 @@ class Container implements ContainerInterface
         return isset($this->services[$id]) || isset($this->aliases[$id]);
     }
 
-    public function get(string $id): ?object
+    /**
+     * @param string $id
+     * @return object
+     * @throws \Exception
+     */
+    public function get(string $id): object
     {
-        $id = $this->aliases[$id] ?? $id;
+        $serviceId = $this->aliases[$id] ?? $id;
 
-        if (isset($this->instances[$id])) {
-            return $this->instances[$id];
+        if (isset($this->instances[$serviceId])) {
+            return $this->instances[$serviceId];
         }
 
-        if (isset($this->services[$id])) {
-            return $this->instances[$id] = $this->autowire($this->services[$id]);
+        if (isset($this->services[$serviceId])) {
+            /** @var class-string $serviceClass */
+            $serviceClass = $this->services[$serviceId];
+            return $this->instances[$serviceId] = $this->autowire($serviceClass);
         }
 
-        /*
-        Вот это вот всё снизу только для создания ленивой загрузки
-            В set мы регаем, но применяем только там, где надо
-            т.е. через этот метод гет
-        */
-
-        //Если передали имя класса
-        if (class_exists($id)) {
+        if (class_exists($serviceId)) {
             try {
-                return $this->instances[$id] = $this->autowire($id);
+                /** @var class-string $serviceId */
+                return $this->instances[$serviceId] = $this->autowire($serviceId);
             } catch (\Exception $e) {
                 throw $e;
             }
         }
 
-        //Если передали интерфейс
-        if(interface_exists($id)) {
-            try{
-                $implementation = $this->resolveInterface($id);
-
-                return $this->instances[$id] = $this->get($implementation);
+        if (interface_exists($serviceId)) {
+            try {
+                $implementation = $this->resolveInterface($serviceId);
+                return $this->instances[$serviceId] = $this->get($implementation);
             } catch (\Exception $e) {
                 throw $e;
             }
         }
 
-        throw new \Exception("Service '$id' not found.");
+        throw new \Exception("Service '$serviceId' not found.");
     }
 
     public function setAlias(string $alias, ?string $service): void
@@ -88,13 +103,14 @@ class Container implements ContainerInterface
         if ($alias === $service) {
             throw new \InvalidArgumentException("An alias cannot reference itself: '$alias'.");
         }
-        //Потом потести на случай сравнения объектов
+
         if (isset($this->aliases[$alias]) && $this->aliases[$alias] === $service) {
             throw new \InvalidArgumentException(
                 "The alias '$alias' was already set for this service '$service'."
             );
         }
-        if ($service) {
+
+        if ($service !== null) {
             $this->aliases[$alias] = $service;
         }
     }
@@ -109,6 +125,9 @@ class Container implements ContainerInterface
         $this->globalParameters[$name] = $value;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setParameters(string $class, array $parameters): void
     {
         if (!isset($this->parameters[$class])) {
@@ -137,40 +156,43 @@ class Container implements ContainerInterface
         return $value;
     }
 
-    private function resolveInterface(string $interface): ?string
+    private function resolveInterface(string $interface): string
     {
-        if(isset($this->aliases[$interface])) {
+        if (isset($this->aliases[$interface])) {
             return $this->aliases[$interface];
         }
 
         $implementation = str_replace('Interface', '', $interface);
 
-        if (class_exists($implementation) && in_array($interface, class_implements($implementation))) {
+        $implements = class_implements($implementation);
+        if (class_exists($implementation) && $implements !== false && in_array($interface, $implements, true)) {
             return $implementation;
-        } elseif (!class_exists($implementation)) {
-            throw new \Exception("Class '$implementation' not found.");
-        } elseif(!in_array($interface, class_implements($implementation))) {
-            throw new \Exception("Class '$implementation' must implement interface '$interface'.");
-        } else {
-            throw new \Exception("No implementation registered or found for interface '$interface'.");
         }
+
+        if (!class_exists($implementation)) {
+            throw new \Exception("Class '$implementation' not found.");
+        }
+
+        $implements = class_implements($implementation);
+        if ($implements === false || !in_array($interface, $implements, true)) {
+            throw new \Exception("Class '$implementation' must implement interface '$interface'.");
+        }
+
+        throw new \Exception("No implementation registered or found for interface '$interface'.");
     }
 
-    private function resolveConstructorParameters(\ReflectionParameter $parameter, ?string $class = null): array|object
+    private function resolveConstructorParameters(\ReflectionParameter $parameter, ?string $class = null): mixed
     {
         $type = $parameter->getType();
 
-        // Если параметр имеет тип
         if ($type instanceof \ReflectionNamedType) {
             try {
                 $typeName = $type->getName();
 
-                // Если это не встроенный тип, пытаемся разрешить зависимость
                 if (!$type->isBuiltin()) {
                     return $this->get($typeName);
                 }
 
-                // Если это встроенный тип, ищем параметр в глобальных или локальных параметрах
                 if ($class !== null && isset($this->parameters[$class][$parameter->getName()])) {
                     return $this->resolveParameter($this->parameters[$class][$parameter->getName()], $class);
                 }
@@ -183,7 +205,6 @@ class Container implements ContainerInterface
             }
         }
 
-        // Если есть значение по умолчанию, используем его
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
@@ -191,7 +212,11 @@ class Container implements ContainerInterface
         throw new \Exception("Cannot resolve parameter '{$parameter->getName()}' for class '$class'.");
     }
 
-    private function autowire(string $id) : object
+    /**
+     * @param class-string $id
+     * @throws \Exception
+     */
+    private function autowire(string $id): object
     {
         if (isset($this->resolving[$id])) {
             throw new \InvalidArgumentException("Cyclic dependency detected while resolving '$id'.");
@@ -208,6 +233,7 @@ class Container implements ContainerInterface
 
             $constructor = $reflectionClass->getConstructor();
             if (!$constructor) {
+                unset($this->resolving[$id]);
                 return new $id();
             }
 
@@ -219,6 +245,7 @@ class Container implements ContainerInterface
             unset($this->resolving[$id]);
             return $reflectionClass->newInstanceArgs($dependencies);
         } catch (\Exception $e) {
+            unset($this->resolving[$id]);
             throw new \Exception("Class '$id' not found: {$e->getMessage()}");
         }
     }

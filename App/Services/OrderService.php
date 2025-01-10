@@ -8,6 +8,15 @@ use App\Services\Contracts\OrderServiceInterface;
 
 class OrderService implements OrderServiceInterface
 {
+    /**
+     * @var array<int, array{
+     *     id: int,
+     *     user_id: int,
+     *     products: string,
+     *     total: float,
+     *     status: string
+     * }>
+     */
     private array $orders = [
         [
             'id' => 1,
@@ -25,6 +34,9 @@ class OrderService implements OrderServiceInterface
         ],
     ];
 
+    /**
+     * @return array{id: int, user_id: int, products: string, total: float, status: string}|null
+     */
     public function getOrderById(int $id): ?array
     {
         foreach ($this->orders as $order) {
@@ -36,18 +48,25 @@ class OrderService implements OrderServiceInterface
         return null;
     }
 
+    /**
+     * @return array<int, array{id: int, user_id: int, products: string, total: float, status: string}>
+     */
     public function getAllOrders(): array
     {
         return $this->orders;
     }
 
+    /**
+     * @param array{user_id?: int|string, products?: string, total?: float|string} $data
+     * @return array{id: int, user_id: int, products: string, total: float, status: string}
+     */
     public function createOrder(array $data): array
     {
         $newOrder = [
             'id' => count($this->orders) + 1,
-            'user_id' => isset($data['user_id']) ? (int)$data['user_id'] : 0,
+            'user_id' => isset($data['user_id']) ? (int) $data['user_id'] : 0,
             'products' => $data['products'] ?? '',
-            'total' => isset($data['total']) ? (float)$data['total'] : 0.0,
+            'total' => isset($data['total']) ? (float) $data['total'] : 0.0,
             'status' => 'pending',
         ];
         $this->orders[] = $newOrder;

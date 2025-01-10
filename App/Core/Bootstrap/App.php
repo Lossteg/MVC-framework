@@ -16,6 +16,9 @@ readonly class App
     public function __construct(
         protected Container $container,
         protected Router $router,
+        /**
+         * @var array{uri: string, method: string}
+         */
         protected array $request,
     ) {
         $this->container->set(OrderServiceInterface::class, OrderService::class);
