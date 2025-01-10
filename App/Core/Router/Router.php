@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Router;
 
-use App\Core\Attributes\AuthorizedAccess;
+use App\Core\Attributes\AccessRecieve;
 use App\Core\Attributes\Route;
 use App\Core\Attributes\RouteGroup;
 use App\Core\DI\Container;
@@ -172,13 +172,13 @@ class Router
                     $callback = [$controller, $method];
 
                     if (method_exists($controller, $method)) {
-                        // Проверка атрибута #[AuthorizedAccess] на уровне класса
+                        // Проверка атрибута #[AccessRecieve] на уровне класса
                         $reflectionClass = new ReflectionClass($class);
-                        $classHasAuth = !empty($reflectionClass->getAttributes(AuthorizedAccess::class));
+                        $classHasAuth = !empty($reflectionClass->getAttributes(AccessRecieve::class));
 
-                        // Проверка атрибута #[AuthorizedAccess] на уровне метода
+                        // Проверка атрибута #[AccessRecieve] на уровне метода
                         $reflectionMethod = new ReflectionMethod($class, $method);
-                        $methodHasAuth = !empty($reflectionMethod->getAttributes(AuthorizedAccess::class));
+                        $methodHasAuth = !empty($reflectionMethod->getAttributes(AccessRecieve::class));
 
                         if ($classHasAuth || $methodHasAuth) {
                             AuthMiddleware::check();

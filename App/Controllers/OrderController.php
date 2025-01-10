@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Attributes\AuthorizedAccess;
+use App\Core\Attributes\AccessRecieve;
 use App\Core\Attributes\Get;
 use App\Core\Attributes\Post;
 use App\Core\Attributes\RouteGroup;
@@ -12,7 +12,7 @@ use App\Core\View\View;
 use App\Services\Contracts\OrderServiceInterface;
 
 #[RouteGroup('/orders')]
-#[AuthorizedAccess]
+#[AccessRecieve]
 readonly class OrderController
 {
     public function __construct(private readonly OrderServiceInterface $orderService)
